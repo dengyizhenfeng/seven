@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-cloak>
     <!-- 第一行 -->
     <el-row>
       <div class="item">
@@ -10,7 +10,7 @@
       </div>
       <div class="item">
         <span>类型</span>
-        <el-select v-model="value" placeholder="请选择">
+        <el-select  placeholder="请选择" value="1">
           <el-option
             v-for="item in options"
             :key="item.value"
@@ -21,7 +21,7 @@
       </div>
       <div class="item">
         <span>发起人</span>
-        <el-select v-model="value" placeholder="请选择">
+        <el-select  placeholder="请选择" value="1">
           <el-option
             v-for="item in options"
             :key="item.value"
@@ -32,7 +32,7 @@
       </div>
       <div class="item">
         <span>发起人</span>
-        <el-select v-model="value" placeholder="请选择">
+        <el-select  placeholder="请选择" value="1">
           <el-option
             v-for="item in options"
             :key="item.value"
@@ -53,7 +53,7 @@
       </div>
       <div class="item">
         <span>状态</span>
-        <el-select v-model="value" placeholder="请选择">
+        <el-select  placeholder="请选择" value="1">
           <el-option
             v-for="item in options"
             :key="item.value"
@@ -64,7 +64,7 @@
       </div>
       <div class="item">
         <span>审批人</span>
-        <el-select v-model="value" placeholder="请选择">
+        <el-select  placeholder="请选择" value="1">
           <el-option
             v-for="item in options"
             :key="item.value"
@@ -74,21 +74,36 @@
         </el-select>
       </div>
       <div class="item">
-        <el-button type="primary" size="small">主要按钮</el-button>
+        <el-button type="primary" size="small">查询</el-button>
         <a href="javascript:;">重置</a>
       </div>
     </el-row>
     <el-row>
       <!-- 表格 -->
       <el-table :data="tableData" style="width: 100%">
-        <el-table-column prop="order" label="序号" width="100px"></el-table-column>
-        <el-table-column prop="type" label="审批类型"></el-table-column>
-        <el-table-column prop="originator" label="发起人"></el-table-column>
-        <el-table-column prop="department" label="发起人部门"></el-table-column>
-        <el-table-column prop="approver" label="当前审批人"></el-table-column>
-        <el-table-column prop="initiationTime" label="审批发起时间"></el-table-column>
-        <el-table-column prop="operationTime" label="最后操作时间"></el-table-column>
-        <el-table-column prop="status" label="审批状态"></el-table-column>
+        <el-table-column type="index" label="序号" width="50"></el-table-column>
+        <el-table-column prop="appr_type" label="审批类型">
+          <template slot-scope="scope">
+            <div v-if="scope.row.appr_type === 1">补卡</div>
+            <div v-else-if="scope.row.appr_type === 2">加班</div>
+            <div v-else-if="scope.row.appr_type === 3">请假</div>
+            <div v-else-if="scope.row.appr_type === 4">外出</div>
+            <div v-else-if="scope.row.appr_type === 5">出差</div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="user_name" label="发起人"></el-table-column>
+        <el-table-column prop="org_name" label="发起人部门"></el-table-column>
+        <el-table-column prop="approver_name" label="当前审批人"></el-table-column>
+        <el-table-column prop="final_time" label="审批发起时间"></el-table-column>
+        <el-table-column prop="apprfinal_time" label="最后操作时间"></el-table-column>
+        <el-table-column prop="status" label="审批状态">
+          <template slot-scope="scope">
+            <div v-if="scope.row.appr_status === 1">未审批</div>
+            <div v-else-if="scope.row.appr_status === 2">审批通过</div>
+            <div v-else-if="scope.row.appr_status === 3">审批未通过</div>
+            <div v-else-if="scope.row.is_repeal === 2">已撤销</div>
+          </template>
+        </el-table-column>
       </el-table>
     </el-row>
   </div>
@@ -100,40 +115,21 @@ export default {
     return {
       dataValue1: "", //日期起始
       dataValue2: "", //日期
-      tableData: [
+      tableData: [], //表格数据
+      options: [
         {
-          order: "1", //序号
-          type: "补卡申请", //审批类型
-          originator: "麋鹿", //发起人
-          department: "技术部", //发起人部门
-          approver: "张三", //当前审批人
-          initiationTime: "2019-01-02 13:00:00", //审批发起时间
-          operationTime: "2019-01-02 13:00:00", //最后操作时间
-          status: "" //审批状态
-        },
-        {
-          order: "1", //序号
-          type: "补卡申请", //审批类型
-          originator: "麋鹿", //发起人
-          department: "技术部", //发起人部门
-          approver: "张三", //当前审批人
-          initiationTime: "2019-01-02 13:00:00", //审批发起时间
-          operationTime: "2019-01-02 13:00:00", //最后操作时间
-          status: "" //审批状态
-        },
-        {
-          order: "1", //序号
-          type: "补卡申请", //审批类型
-          originator: "麋鹿", //发起人
-          department: "技术部", //发起人部门
-          approver: "张三", //当前审批人
-          initiationTime: "2019-01-02 13:00:00", //审批发起时间
-          operationTime: "2019-01-02 13:00:00", //最后操作时间
-          status: "" //审批状态
+          label: "abc",
+          value: 1
         }
       ]
     };
-  }
+  },
+  watch: {
+    tableList() {
+      this.tableData = this.tableList
+    }
+  },
+  props: ["tableList"]
 };
 </script>
 
@@ -160,6 +156,7 @@ export default {
     }
   }
 }
+
 .item {
   float: left;
   margin-right: 30px;
@@ -174,7 +171,7 @@ export default {
   height: 30px;
   line-height: 30px;
   text-align: center;
-  background-color: #58A1F4;
+  background-color: #58a1f4;
   color: #fff;
   text-decoration: none;
 }

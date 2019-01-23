@@ -9,6 +9,8 @@ import 'vue-event-calendar/dist/style.css' //1.1.10之后的版本，css被放�
 import vueEventCalendar from 'vue-event-calendar'
 import moment from 'moment'
 
+// 全局注册eventBus
+// window.enentBus = new Vue()
 Vue.use(vueEventCalendar, {locale: 'en'}) //可以设置语言，支持中文和英文
 
 Vue.prototype.$moment = moment

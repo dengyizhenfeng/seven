@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import UserElement from '@/components/userElement/userElement.vue'
 import Login from '@/components/login/login.vue'
 import LoginDefault from '../components/login/login-default.vue'
 import LoginZhaohui from '../components/login/login-zhaohui.vue'
@@ -17,12 +16,22 @@ import AddAttendance from '@/components/home/attendance/addAttendance/addAttenda
 import Approval from '@/components/home/approval/approval.vue'
 import ApprovalList from '@/components/home/approval/approval-list/approval-list.vue'
 import ApprovalSetting from '@/components/home/approval/approval-setting/approval-setting.vue'
+// 人资
+import Human from '@/components/home/human/human.vue'
+import CurrentHuman from '@/components/home/human/current-human/current-human.vue'
+import ElectronicsHuman from '@/components/home/human/electronics-human/electronics-human.vue'
+import HistoryHuman from '@/components/home/human/history-human/history-human.vue'
+// 组织架构
+import Organization from '@/components/home/organization/organization.vue'
+import OrganizationalStructure from '@/components/home/organization/organizational-structure/organizational-structure.vue'
+import PostManagement from '@/components/home/organization/post-management/post-management.vue'
+import OrganizationDetails from '@/components/home/organization/organizational-structure/organization-details.vue'
+import PersonManage from '@/components/home/organization/organizational-structure/person-manage.vue'
 Vue.use(Router)
 
 export default new Router({
   routes: [
     {path: '/', redirect: '/home/page'},
-    // {path: '/userElement', component: UserElement},
     {
       name: 'login',
       path: '/login',
@@ -57,9 +66,32 @@ export default new Router({
           name: 'approval',
           path: '/approval',
           component: Approval,  //审批
+          redirect: '/approval/approval-list',
           children: [
             {path: 'approval-list', component: ApprovalList}, // 审批列表
             {path: 'approval-setting', component: ApprovalSetting} // 审批设置
+          ]
+        },
+        {
+          name: 'human',
+          path: '/human',
+          component: Human,
+          children: [
+            {path: 'current-human', component: CurrentHuman},
+            {path: 'history-human', component: HistoryHuman},
+            {path: 'electronics-human', component: ElectronicsHuman},
+          ]
+        },
+        {
+          name: 'organization',
+          path: '/organization',
+          component: Organization,
+          redirect: '/organization/organizational-structure',
+          children: [
+            {path: 'organizational-structure', component: OrganizationalStructure},
+            {path: 'post-management', component: PostManagement},
+            {path: 'organization-details', component: OrganizationDetails},
+            {path: 'person-manage', component: PersonManage}
           ]
         }
       ]

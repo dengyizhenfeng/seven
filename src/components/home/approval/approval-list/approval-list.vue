@@ -1,16 +1,16 @@
 <template>
-  <div class="list-box">
-    <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
+  <div class="approval-list-box">
+    <el-tabs v-model="activeName" type="card">
       <el-tab-pane label="全部" name="all">
-        <listAll/>
+        <listAll :tableList="tableList"/>
       </el-tab-pane>
-      <el-tab-pane label="审批中（0）" name="auditing">
+      <el-tab-pane :label="'审批中（'+ tableData.prepareAppr +'）'" name="auditing">
         <Auditing/>
       </el-tab-pane>
-      <el-tab-pane label="本月通过（40）" name="resolve">
+      <el-tab-pane :label="'本月通过（'+ tableData.passAppr +'）'" name="resolve">
         <Reject/>
       </el-tab-pane>
-      <el-tab-pane label="本月驳回（10）" name="reject">
+      <el-tab-pane :label="'本月驳回（' + tableData.rejectAppr + '）'" name="reject">
         <Resolve/>
       </el-tab-pane>
     </el-tabs>
@@ -26,7 +26,9 @@ import Resolve from "./resolve.vue";
 export default {
   data() {
     return {
-      activeName: 'all'
+      activeName: "all",
+      tableData: {}, //列表数据
+      tableList: [] // 表格数据
     };
   },
   methods: {},
@@ -35,13 +37,40 @@ export default {
     Auditing,
     Reject,
     Resolve
+  },
+  // 请求审批列表数据
+  created() {
+    this.$http({
+      url: "getApprStatus",
+      method: "post",
+      params: {
+        companyId: 1
+      }
+    }).then(res => {
+      var { state, datas } = res.data;
+      if (state === 200) {
+        this.tableData = datas;
+        this.tableList = datas.list;
+      }
+    });
   }
 };
 </script>
 
 <style lang="less">
-.list-box {
+.approval-list-box {
   padding: 0 40px;
+  .el-input__inner {
+    height: 30px;
+    line-height: 30px;
+  }
+  .el-table th {
+    height: 40px;
+    line-height: 40px;
+    background-color: #eef0fa;
+    font-weight: 400;
+    padding: 0;
+  }
   // 选项卡样式
   .el-tabs--card > .el-tabs__header {
     border-bottom: none;

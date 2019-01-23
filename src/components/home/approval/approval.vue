@@ -9,7 +9,13 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      
+    };
+  }
+};
 </script>
 
 <style lang='less' scoped>
@@ -23,7 +29,7 @@ export default {};
     a {
       text-decoration: none;
       font-size: 16px;
-      &:first-child{
+      &:first-child {
         margin-right: 56px;
       }
     }

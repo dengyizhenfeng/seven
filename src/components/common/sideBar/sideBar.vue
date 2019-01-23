@@ -12,7 +12,7 @@
         </div>
       </el-col>
     </el-row>
-    <el-menu  class="el-menu-vertical" @open="" @close="" router>
+    <el-menu  class="el-menu-vertical" router>
       <el-menu-item index="/home">
         <i>
           <img src="../../../assets/images/sy_gzt.png" alt>
@@ -34,7 +34,7 @@
         </i>
         <span slot="title">企业机制建设</span>
       </el-menu-item>
-      <el-menu-item index="/approval">
+      <el-menu-item index="/organization">
         <i>
           <img src="../../../assets/images/sy_zjjg.png" alt>
           <img src="../../../assets/images/sy_zjjgxz.png" alt>
@@ -63,7 +63,7 @@
         <span slot="title">考勤</span>
         <!-- <router-link to="../../home/attendance/attendance-home"></router-link> -->
       </el-menu-item>
-      <el-menu-item index="8">
+      <el-menu-item index="/human">
         <i>
           <img src="../../../assets/images/gzt_wdrw.png" alt>
           <img src="../../../assets/images/gzt_wdrwxz.png" alt>

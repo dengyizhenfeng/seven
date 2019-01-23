@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="record-box">
     <!-- 时间、部门、员工 -->
     <el-row class="record-r1">
       <el-form :inline="true" :model="formData">
@@ -11,8 +11,8 @@
             value-format="yyyy-MM-dd"
             :picker-options="pickerOptions1"
             type="date"
-            placeholder="开始时间">
-          </el-date-picker>
+            placeholder="开始时间"
+          ></el-date-picker>
           <span>至</span>
           <el-date-picker
             v-model="formData.endTime"
@@ -20,30 +20,23 @@
             value-format="yyyy-MM-dd"
             :picker-options="pickerOptions1"
             type="date"
-            placeholder="结束时间">
-          </el-date-picker>
+            placeholder="结束时间"
+          ></el-date-picker>
         </el-form-item>
         <!--部门-->
         <el-form-item label="部门">
           <el-select v-model="formData.orgId" placeholder="全公司">
             <el-option
-              v-for="item in options1"
+              v-for="item in orgOpt"
               :key="item.value"
               :label="item.label"
-              :value="item.value">
-            </el-option>
+              :value="item.value"
+            ></el-option>
           </el-select>
         </el-form-item>
         <!--员工-->
         <el-form-item label="员工">
-          <el-select v-model="formData.name" placeholder="姓名或工号">
-            <el-option
-              v-for="item in options2"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
+          <el-input v-model="nameOrJobNum" placeholder="姓名或工号"></el-input>
         </el-form-item>
         <!--操作按钮-->
         <el-button type="primary" @click="query">查询</el-button>
@@ -55,28 +48,31 @@
     <el-row>
       <el-col :span="24">
         <div class="grid-content bg-purple-dark">
-          <el-table
-            id="rebateSetTable"
-            :data="tableData"
-            border
-            style="width: 100%">
+          <el-table id="rebateSetTable" :data="tableData" style="width: 100%">
             <el-table-column
-              prop="gonghao"
-              label="工号"
-              width="180">
-            </el-table-column>
-            <el-table-column
-              prop="name"
-              label="姓名"
-              width="180">
-            </el-table-column>
-            <el-table-column
-              prop="bumen"
-              label="部门">
-            </el-table-column>
-            <el-table-column
-              prop="zhiwei"
-              label="职位">
+              v-for="(value, key, i) in tableHead"
+              :key="i"
+              :label="value"
+              :prop="key"
+            >
+              <!-- 拆分对象 -->
+              <template slot-scope="scope">
+                <div v-if="typeof scope.row[key] !== 'object'">{{ scope.row[key] }}</div>
+                <div v-else>
+                  <!-- 根据时间显示不同 -->
+                  <div v-if="scope.row[key].offClockTime === ''" class="missing">缺卡</div>
+                  <div
+                    v-else-if="scope.row[key].offClockTime < scope.row[key].offDutyTime"
+                    class="early"
+                  >早退</div>
+                  <div
+                    v-else-if="scope.row[key].onClockTime > scope.row[key].onDutyTime"
+                    class="late"
+                  >迟到</div>
+                  <div v-else-if="scope.row[key].onClockTime === null" class="absenteeism">旷工</div>
+                  <div v-else-if="scope.row[key].onClockTime" class="normal">正常</div>
+                </div>
+              </template>
             </el-table-column>
           </el-table>
         </div>
@@ -92,100 +88,145 @@
           :page-sizes="[100, 200, 300, 400]"
           :page-size="100"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="400">
-        </el-pagination>
+          :total="400"
+        ></el-pagination>
       </el-col>
     </el-row>
   </div>
 </template>
 
 <script>
-  import FileSaver from 'file-saver'
-  import XLSX from 'xlsx'
+import FileSaver from "file-saver";
+import XLSX from "xlsx";
 
-  export default {
-    data() {
-      return {
-        // 表单对象
-        formData: {
-          beginTime: '', //开始日期
-          endTime: '', //结束时间
-          orgId: '', //组织ID
-          name: '' //员工
-        },
-        pickerOptions1: { //日期有关选项，比如禁用
-          disabledDate(time) {
-            return time.getTime() > Date.now();
-          }
-        },
-        options1: [{  // 部门中的选项
-          value: '选项1',
-          label: '黄金糕'
-        }],
-        options2: [{  // 员工中的选项
-          value: '后台需要的值',
-          label: '前台展示的文本'
-        }],
-        //表格后半部分，应该是要根据你选择的日期动态改变，下面这个是存放这个日期的
-        dataList: [],
-        // 表格需要渲染的数据
-        tableData: [
-          {gonghao: 1000, name: 'abc', bumen: '部门什么', zhiwei: '这是什么职位'}
-        ],
-        currentPage: 1, // 当前页
-      }
-    },
-    methods: {
-      // sizechange事件
-      handleSizeChange() {
+export default {
+  data() {
+    return {
+      // 需要被渲染的表格的日期
+      // dateList: [],
+      // 表单对象
+      formData: {
+        companyId: 1,
+        orgId: 0,
+        beginTime: "", //本月第一天
+        endTime: "" // 当前日期的前一天
       },
-      // currentchange事件
-      handleCurrentChange() {
-      },
-      query() { //查询事件
-        this.$http({
-          method: 'POST',
-          url: '/attendance/company/record',
-          params: this.formData,
-        }).then(res => {
-          console.log(res);
-        })
-      },
-      exportExcel() { //导出excel表格
-        let wb = XLSX.utils.table_to_book(document.querySelector('#rebateSetTable'));
-        let wbout = XLSX.write(wb, {bookType: 'xlsx', bookSST: true, type: 'array'});
-        try {
-          FileSaver.saveAs(new Blob([wbout], {type: 'application/octet-stream'}), '71.xlsx');
-        } catch (e) {
-          if (typeof console !== 'undefined')
-            console.log(e, wbout)
+      nameOrJobNum: "", //用来接收姓名或工号
+      pickerOptions1: {
+        //日期有关选项，比如禁用
+        disabledDate(time) {
+          return time.getTime() > Date.now();
         }
-        return wbout
+      },
+      // 部门中的选项
+      orgOpt: [],
+      // 表格需要渲染的数据
+      tableData: [],
+      currentPage: 1, // 当前页
+      tableHead: [],
+      tableBody: []
+    };
+  },
+  methods: {
+    // sizechange事件
+    handleSizeChange() {},
+    // currentchange事件
+    handleCurrentChange() {},
+    query() {
+      //查询事件
+      // 添加name或者ID
+      if (this.nameOrJobNum !== "") {
+        if (Number(this.nameOrJobNum)) {
+          this.formData.jobNum = Number(this.nameOrJobNum);
+        } else {
+          this.formData.name = this.nameOrJobNum;
+        }
       }
+      this.$http({
+        method: "post",
+        url: "attendance/company/record",
+        params: this.formData
+      }).then(res => {
+        let { state, datas } = res.data;
+        if (state === 200) {
+          console.log(datas);
+          this.tableData = datas.slice(1);
+          this.tableHead = datas[0];
+        }
+      });
     },
-      created() {
-        console.log(1);
+    exportExcel() {
+      //导出excel表格
+      let wb = XLSX.utils.table_to_book(
+        document.querySelector("#rebateSetTable")
+      );
+      let wbout = XLSX.write(wb, {
+        bookType: "xlsx",
+        bookSST: true,
+        type: "array"
+      });
+      try {
+        FileSaver.saveAs(
+          new Blob([wbout], { type: "application/octet-stream" }),
+          "71.xlsx"
+        );
+      } catch (e) {
+        if (typeof console !== "undefined") console.log(e, wbout);
       }
-      // watch: {
-      //   date: function (newVal, oldVal) {
-      //     newVal.forEach((item, i) => {
-      //       console.log(this.$moment(item).format('MM d w'));
-      //       // var tableDate = this.$moment(item).date()
-      //       // var tableWeek = this.$moment(item).day()
-      //       // this.dataList.push(`${tableDate}(${tableWeek})`)
-      //     })
-      //     console.log(this.dataList)
-      //   }
-      // }
+      return wbout;
     }
+  },
+  created() {
+    // 获取当前月份第一天
+    this.formData.beginTime = this.$moment(
+      new Date().getFullYear() + "-" + (new Date().getMonth() + 1) + "-" + 1
+    ).format("YYYY-MM-DD");
+    // 获取当前日期前一天
+    this.formData.endTime = this.$moment(
+      new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+    ).format("YYYY-MM-DD");
+    this.orgOpt = this.opt;
+  },
+  props: ["opt"]
+};
 </script>
 
 <style lang="less">
+.record-box {
+  #rebateSetTable {
+    .missing,
+    .early,
+    .late,
+    .absenteeism,
+    .normal {
+      display: inline-block;
+      width: 50px;
+      height: 20px;
+      line-height: 20px;
+      text-align: center;
+      border-radius: 3px;
+    }
+    .missing,
+    .early {
+      background-color: #fbb766;
+      color: #fff;
+    }
+    .normal {
+      background-color: #58a1f4;
+      color: #fff;
+    }
+    .absenteeism {
+      color: #fff;
+      background-color: #f76c6c;
+    }
+  }
   // 柵格样式
-  .el-row {
-    margin-bottom: 20px;
-    &:last-child {
-      margin-bottom: 0;
+  .record-box {
+    .el-row {
+      margin-bottom: 20px;
+      &:last-child {
+        margin-bottom: 0;
+      }
     }
   }
 
@@ -205,9 +246,12 @@
     width: 7%;
   }
   .record-r1 {
+    .el-table th {
+      padding: 0;
+    }
     line-height: 36px;
     /*input样式*/
-    /deep/.el-input__inner{
+    /deep/.el-input__inner {
       height: 30px;
       padding-left: 20px;
     }
@@ -221,33 +265,43 @@
       left: auto;
     }
     /*表格项样式*/
-    /deep/.el-form-item{
+    /deep/.el-form-item {
       margin-bottom: 0;
     }
     /*按钮样式*/
-    /deep/.el-button--primary{
+    /deep/.el-button--primary {
       width: 70px;
       height: 30px;
       line-height: 29px;
       padding: 0;
     }
-    .reset{
+    .reset {
       background-color: transparent;
       border-color: transparent;
-      color: #61688D;
+      color: #61688d;
+    }
+    /*导出样式*/
+    .export {
+      float: right;
+      width: 102px;
+      height: 30px;
+      margin-top: 6px;
+      border-radius: 4px;
+      background-color: #58a1f4;
+      line-height: 30px;
+      text-align: center;
+      text-decoration: none;
+      color: #fff;
+      font-size: 14px;
     }
   }
-  /*导出样式*/
-  .export{
-    float: right;
-    width:102px;
-    height:30px;
-    margin-top: 6px;
-    border-radius: 4px;
-    background-color: #58A1F4;
-    line-height: 30px;
-    text-align: center;
-    text-decoration: none;
-    color: #fff;
+
+  // 表格头部
+  /deep/.el-table th {
+    padding: 0;
+    height: 40px;
+    line-height: 40px;
+    background-color: #eef0fa;
   }
+}
 </style>
