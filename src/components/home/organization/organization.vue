@@ -5,7 +5,7 @@
         to="/organization/organizational-structure"
         active-class="organiztion-active"
       >组织机构</router-link>
-      <router-link to="/organization/post-management" active-class="organiztion-active">岗位管理</router-link>
+      <!-- <router-link to="/organization/post-management" active-class="organiztion-active">岗位管理</router-link> -->
     </el-row>
     <el-row>
       <router-view></router-view>
@@ -32,7 +32,7 @@ export default {
   .organiztion-link {
     height: 60px;
     line-height: 60px;
-    text-align: center;
+    // text-align: center;
     border-bottom: 1px solid #EEF0FA;
     a {
       position: relative;
@@ -44,17 +44,17 @@ export default {
       }
       &.organiztion-active {
         font-weight: 700;
-        &::after {
-          content: "";
-          position: absolute;
-          width: 24px;
-          height: 4px;
-          border-radius: 2px;
-          background-color: #58a1f4;
-          left: 50%;
-          transform: translateX(-50%);
-          bottom: -19px;
-        }
+        // &::after {
+        //   content: "";
+        //   position: absolute;
+        //   width: 24px;
+        //   height: 4px;
+        //   border-radius: 2px;
+        //   background-color: #58a1f4;
+        //   left: 50%;
+        //   transform: translateX(-50%);
+        //   bottom: -19px;
+        // }
       }
     }
   }

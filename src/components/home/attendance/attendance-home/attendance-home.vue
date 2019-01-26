@@ -50,12 +50,12 @@ export default {
         companyId: 1
       }
     }).then(res => {
-      console.log(res)
+      console.log(res);
       let { state, datas } = res.data;
       if (state === 200) {
         this.orgOpt.push({ value: 0, label: "全公司" });
         datas.forEach(item => {
-          // this.orgOpt.push({ value: item.orgId, label: item.orgName });
+          this.orgOpt.push({ value: item.orgId, label: item.orgName });
         });
       }
     });
@@ -64,33 +64,37 @@ export default {
 </script>
 
 <style scoped lang="less">
+/deep/.el-tabs__item:last-child {
+  padding-left: 0;
+  margin-left: 20px;
+}
 #tab {
   height: 100%;
   /deep/.el-form--inline .el-form-item__content {
     vertical-align: middle !important;
   }
 }
-/deep/.el-tabs__active-bar{
+/deep/.el-tabs__active-bar {
   display: none;
 }
-/deep/.el-tabs__item.is-active{
+/deep/.el-tabs__item.is-active {
   position: relative;
-  &::after{
-content: '';
-position: absolute;
-left: 50%;
-bottom: 0;
-transform: translateX(-50%);
-width: 24px;
-height: 4px;
-background-color: #58A1F4;
+  &::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 4px;
+    background-color: #58a1f4;
   }
 }
-/deep/.el-tabs--top .el-tabs__item.is-top:nth-child(2){
+/deep/.el-tabs--top .el-tabs__item.is-top:nth-child(2) {
   padding: 0;
   margin-right: 20px;
 }
-/deep/.el-tabs__nav-wrap::after{
+/deep/.el-tabs__nav-wrap::after {
   height: 1px;
 }
 </style>

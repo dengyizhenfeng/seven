@@ -77,7 +77,7 @@
 </template>
 
 <script>
-  import OrganizationDetailsBread from './organizationDetailsBread.vue'
+  import OrganizationDetailsBread from '../detailsBread.vue'
 
   export default {
     name: "person-manage",

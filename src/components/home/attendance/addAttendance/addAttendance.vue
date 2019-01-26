@@ -7,9 +7,9 @@
       <el-step title="考勤规则" class="step-three"></el-step>
     </el-steps>
     <!--下方表单部分-->
-    <Step1 v-if="active === 0" v-model="active" @formData1="receiveForm1"></Step1>
-    <Step2 v-else-if="active === 1" v-model="active" @formData2="receiveForm2"></Step2>
-    <Step3 v-else v-model="active" :parentForm="form"></Step3>
+    <Step1 v-if="active === 0" v-model="active" @formData1="receiveForm1" :addattendance="addattendance"></Step1>
+    <Step2 v-else-if="active === 1" v-model="active" @formData2="receiveForm2" :addattendance="addattendance"></Step2>
+    <Step3 v-else v-model="active" :parentForm="form" :addattendance="addattendance"></Step3>
   </div>
 </template>
 
@@ -22,7 +22,8 @@ export default {
   data() {
     return {
       active: 0,
-      form: {}
+      form: {},
+      addattendance: {}
     };
   },
   methods: {

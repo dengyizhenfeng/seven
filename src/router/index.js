@@ -27,6 +27,8 @@ import OrganizationalStructure from '@/components/home/organization/organization
 import PostManagement from '@/components/home/organization/post-management/post-management.vue'
 import OrganizationDetails from '@/components/home/organization/organizational-structure/organization-details.vue'
 import PersonManage from '@/components/home/organization/organizational-structure/person-manage.vue'
+import ManagementDetails from '@/components/home/organization/post-management/management-details.vue'
+import ManagementAttribute from '@/components/home/organization/post-management/management-attribute.vue'
 Vue.use(Router)
 
 export default new Router({
@@ -83,15 +85,18 @@ export default new Router({
           ]
         },
         {
-          name: 'organization',
+          name: 'organization',  //组织架构
           path: '/organization',
           component: Organization,
           redirect: '/organization/organizational-structure',
           children: [
-            {path: 'organizational-structure', component: OrganizationalStructure},
-            {path: 'post-management', component: PostManagement},
-            {path: 'organization-details', component: OrganizationDetails},
-            {path: 'person-manage', component: PersonManage}
+            {path: 'organizational-structure', component: OrganizationalStructure}, //组织架构
+            {path: 'organization-details', component: OrganizationDetails}, //组织详情
+            {path: 'person-manage', component: PersonManage}, //人员管理
+
+            {path: 'post-management', component: PostManagement}, //岗位管理
+            {path: 'management-attribute', component: ManagementAttribute}, //岗位属性
+            {path: 'management-details', component: ManagementDetails} //岗位详情
           ]
         }
       ]

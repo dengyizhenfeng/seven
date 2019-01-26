@@ -4,7 +4,7 @@
       <el-form :inline="true" :model="formData">
         <!--关键字-->
         <el-form-item label="关键字">
-          <el-input v-model="formData.groupName" placeholder="关键字"></el-input>
+          <el-input v-model.trim="formData.groupName" placeholder="关键字"></el-input>
         </el-form-item>
         <!--排序-->
         <!-- <el-form-item label="排序">
@@ -52,7 +52,7 @@
       <el-table-column prop="users" label="适用范围"></el-table-column>
       <el-table-column fixed="right" label="操作" width="100">
         <template slot-scope="scope">
-          <img src="../../../../../assets/images/kq_bssz.png" alt="">
+          <img src="../../../../../assets/images/kq_bssz.png" alt="" @click="edit(scope.row.groupId)">
         </template>
       </el-table-column>
     </el-table>
@@ -69,7 +69,9 @@ export default {
         groupName: "" //关键字
       },
       //表格数据
-      tableData: []
+      tableData: [],
+      // 当前编辑的时候需要的数据
+      attendanceData: {}
     };
   },
   methods: {
@@ -99,7 +101,27 @@ export default {
     add() {
       //新增考勤组
       this.$router.push("/attendance/addAttendance");
+    },
+    // 编辑的时候的事件
+    edit(val) {
+      this.$http({
+        method: 'post',
+        url: 'attendance/company/queryDetails',
+        params: {
+          groupId: val
+        }
+      }).then(res => {
+        let {state, datas} = res.data
+        if(state === 200) {
+          this.attendanceData = datas
+          this.$router.push('/attendance/addAttendance')
+        }
+      })
+      
     }
+  },
+  beforeDestroy() {
+    eventBus.$emit('attendanceData', this.attendanceData)
   }
 };
 </script>

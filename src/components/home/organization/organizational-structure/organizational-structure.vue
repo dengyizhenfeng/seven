@@ -10,26 +10,48 @@
       <div class="right">
         <a @click="add" href="javascript:;">新增组织</a>
         <a href="javascript:;" @click="importFlag = true">批量导入</a>
-        <a href="javascript:;">导出组织架构</a>
+        <a href="javascript:;" @click="exportExcel">导出组织架构</a>
       </div>
     </el-row>
     <el-row>
       <!-- 最外层表格 -->
-      <el-table :data="tableData5" style="width: 100%" class="outer">
+      <table class="table-box">
+        <thead>
+          <tr>
+            <th>组织名称</th>
+            <th>在职人数</th>
+            <th>全职员工</th>
+            <th>非全职员工</th>
+            <th>人员编制</th>
+            <th>缺编超编</th>
+            <th>负责人</th>
+          </tr>
+        </thead>
+        <tbody>
+          <items v-for="model in tableData" :model="model" :key="model.companyId"></items>
+        </tbody>
+      </table>
+      <!-- <el-table :data="tableData5" style="width: 100%" class="outer" id="rebateSetTable">
         <el-table-column type="expand">
-          <!-- <template slot-scope="props">
-            <el-table-colmn label="组织名称" prop="row.id"></el-table-colmn>
-          </template>-->
         </el-table-column>
         <el-table-column label="组织名称" prop="zuzhimingcheng"></el-table-column>
         <el-table-column label="在职人数" prop="zaizhirenshu"></el-table-column>
         <el-table-column label="全职员工" prop="quanzhiyuangong"></el-table-column>
         <el-table-column label="非全职员工" prop="feiquanzhiyuangong"></el-table-column>
-        <el-table-column label="人员编制" prop="renyuanbianzhi"></el-table-column>
+        <el-table-column label="人员编制" prop="renyuanbianzhi">
+          <template slot-scope="scope">
+            <div>
+              {{scope.row.renyuanbianzhi}}
+              <img
+                src="@/assets/images/organization/zzjg_bj_ls_ic.png"
+                alt
+              >
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column label="缺编超编" prop="quebian"></el-table-column>
         <el-table-column label="负责人" prop="fuzeren"></el-table-column>
-        <el-table-column label="分管领导" prop="fenguanlingdao"></el-table-column>
-      </el-table>
+      </el-table>-->
     </el-row>
     <!-- 新增组织 -->
     <el-dialog title="新增组织" :visible.sync="dialogFormVisible" custom-class="add-org">
@@ -89,6 +111,29 @@
 </template>
 
 <script>
+// 引入导出excel组件
+import FileSaver from "file-saver";
+import XLSX from "xlsx";
+// 引入树形表格组件
+import items from "./items.vue";
+// 处理联动数据
+function deep(targetObj, fullData) {
+  if (targetObj.orgParentId === 0) {
+    fullData.children.push(targetObj);
+    return;
+  }
+  if (fullData.children === undefined) {
+    fullData.children = [];
+  }
+  if (targetObj.orgParentId === fullData.orgId) {
+    fullData.children.push(targetObj);
+    return;
+  }
+
+  fullData.children.forEach(item => {
+    deep(targetObj, item);
+  });
+}
 export default {
   data() {
     return {
@@ -101,25 +146,48 @@ export default {
       //搜索组织
       sousuozuzhi: "",
       //表格数据
-      tableData5: [
+      tableData: [
         {
-          zuzhimingcheng: "zuzhimingcheng",
-          zaizhirenshu: "zaizhirenshu",
-          quanzhiyuangong: "quanzhiyuangong",
-          feiquanzhiyuangong: "feiquanzhiyuangong",
-          renyuanbianzhi: "renyuanbianzhi",
-          quebian: "quebian",
-          fuzeren: "fuzeren",
-          fenguanlingdao: "fenguanlingdao"
-        },
-        {
-          zuzhimingcheng: "zuzhimingcheng",
-          zaizhirenshu: "zaizhirenshu",
-          quanzhiyuangong: "quanzhiyuangong",
-          renyuanbianzhi: "renyuanbianzhi",
-          quebian: "quebian",
-          fuzeren: "fuzeren",
-          fenguanlingdao: "fenguanlingdao"
+          companyId: 1,
+          orgName: "北京好的科技有限公司",
+          orgUserNum: "",
+          fullTimeNum: "",
+          orgAs: "",
+          leaderId: "",
+          children: [
+            {
+              orgId: 3,
+              companyId: 1,
+              orgName: "财务部",
+              orgType: 1,
+              orgParentId: 0,
+              orgUserNum: 0,
+              fullTimeNum: 0,
+              orgAs: 0,
+              leaderId: null,
+              leaderName: null,
+              orgShort: null,
+              orgCode: null,
+              orgDesc: null,
+              children: [
+                {
+                  orgId: 4,
+                  companyId: 1,
+                  orgName: "下一级",
+                  orgType: 1,
+                  orgParentId: 0,
+                  orgUserNum: 0,
+                  fullTimeNum: 0,
+                  orgAs: 0,
+                  leaderId: null,
+                  leaderName: null,
+                  orgShort: null,
+                  orgCode: null,
+                  orgDesc: null
+                }
+              ]
+            }
+          ]
         }
       ],
       options: [
@@ -144,16 +212,79 @@ export default {
       }
     };
   },
-
+  created() {
+    // 请求原始列表数据
+    // this.$http({
+    //   method: "post",
+    //   url: "org/company/queryList",
+    //   params: {
+    //     companyId: 1
+    //   }
+    // }).then(res => {
+    //   console.log(res)
+    // })
+    // deep()
+  },
   methods: {
     add() {
       this.dialogFormVisible = true;
+    },
+    exportExcel() {
+      //导出excel表格
+      let wb = XLSX.utils.table_to_book(
+        document.querySelector("#rebateSetTable")
+      );
+      let wbout = XLSX.write(wb, {
+        bookType: "xlsx",
+        bookSST: true,
+        type: "array"
+      });
+      try {
+        FileSaver.saveAs(
+          new Blob([wbout], { type: "application/octet-stream" }),
+          "71.xlsx"
+        );
+      } catch (e) {
+        if (typeof console !== "undefined") console.log(e, wbout);
+      }
+      return wbout;
+    },
+    created() {
+      this.$http({
+        methods: "post",
+        url: "org/company/queryList",
+        params: {
+          companyId: 1
+        }
+      }).then(res => {
+        console.log(res);
+      });
     }
+  },
+  components: {
+    items
   }
 };
 </script>
 <style lang='less' scoped>
 .org-stru-box {
+  // 表格样式
+  // .table-box {
+  //   width: 100%;
+  //   thead {
+  //     width: 100%;
+  //     // display: flex;
+  //     tr {
+  //       width: 100%;
+  //     }
+  //   }
+  // }
+  .el-table th,
+  .el-table tr {
+    img {
+      margin-left: 10px;
+    }
+  }
   .operation {
     height: 50px;
     border-bottom: 1px solid #eef0fa;

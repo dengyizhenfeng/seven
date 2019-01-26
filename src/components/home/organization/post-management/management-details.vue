@@ -4,7 +4,6 @@
     <div class="organ-detail-head">
       <div class="left">
         <h2>71管家-技术部</h2>
-        <span>上级组织：北京俊宏科技有限公司</span>
       </div>
       <div class="right">
         <div class="right-1">
@@ -12,7 +11,6 @@
             在职员工
             <span>1</span>人
           </div>
-          <a href="javascript:;" class="person-manage">人员管理</a>
         </div>
         <div class="right-2">
           <div>
@@ -24,6 +22,11 @@
       </div>
     </div>
     <div class="quit-edit">
+      <!-- 切换 -->
+      <div class="management-details-link">
+        <a href="javascript:;" :class="{active: isActive}" @click="isActive = true">基本信息</a>
+        <a href="javascript:;" :class="{active: !isActive}" @click="isActive = false">岗位属性</a>
+      </div>
       <div class="title">
         <h3>快捷操作</h3>
         <a href="javascript:;" class="edit" v-if="editFlag" @click="editFlag = !editFlag">
@@ -113,6 +116,7 @@
     data() {
       return {
         editFlag: true, //是否显示编辑按钮
+        isActive: true, 
         form: {
           name: ''
         }
@@ -189,10 +193,6 @@
               color: #58a1f4;
               font-size: 16px;
             }
-          }
-          .person-manage {
-            background-color: #58a1f4;
-            color: #fff;
           }
         }
         .right-2 {
@@ -378,6 +378,37 @@
       }
 
     }
+    // 编辑头部切换
+    .management-details-link{
+      position: relative;
+      top: 10px;
+        display: inline-block;
+        width: 240px;
+        height: 40px;
+        border: 1px solid #BEC5EA;
+        border-radius: 20px;
+        box-sizing: content-box;
+        a{
+          display: inline-block;
+          width: 120px;
+          height: 40px;
+          line-height: 40px;
+          text-align: center;
+          text-decoration: none;
+          color: #61688D;
+          &:last-child{
+            margin-left: -5px;
+          }
+        }
+        .active{
+          display: inline-block;
+          text-decoration: none;
+          background-color: #58A1F4;
+          color: #fff;
+          box-shadow: 0 0 0 1px #58A1F4;
+          border-radius: 20px;
+        }
+      }
   }
 
 </style>

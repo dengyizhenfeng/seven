@@ -85,7 +85,7 @@
       </el-form-item>
       <el-row class="btn">
         <el-button type="success" plain @click="prevStep">上一步</el-button>
-        <el-button type="success" @click="complete">完成</el-button>
+        <el-button type="success"  @click="dialogFormVisible4 = true">完成</el-button>
       </el-row>
     </el-form>
     <!-- 迟到编辑弹出框 -->
@@ -166,6 +166,21 @@
         <el-button @click="dialogFormVisible3 = false">取 消</el-button>
       </div>
     </el-dialog>
+    <!-- 完成弹框 -->
+    <el-dialog title="审批流程编辑" :visible.sync="dialogFormVisible4" class="complete">
+      <div class="content">
+        <img src="../../../../assets/images/kq_czwc.png" alt="">
+        <p>保存成功</p>
+        <p>您已完成了一个考勤组的设置，可继续进行以下操作</p>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible1 = false">返回</el-button>
+        <el-button type="primary" @click="dialogFormVisible1 = false">
+          去创建考勤组&nbsp;&nbsp;
+          <img src="@/assets/images/kq_qjbs.png" alt>
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -186,6 +201,8 @@ export default {
       dialogFormVisible1: false,
       dialogFormVisible2: false,
       dialogFormVisible3: false,
+      // 完成弹框
+      dialogFormVisible4: false,
       // 编辑迟到数据
       lateCharge: {
         rule: 1, //迟早分钟，目前写死

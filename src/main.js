@@ -8,9 +8,10 @@ import MyAxios from '@/assets/js/myaxios.js'
 import 'vue-event-calendar/dist/style.css' //1.1.10之后的版本，css被放在了单独的文件中，方便替换
 import vueEventCalendar from 'vue-event-calendar'
 import moment from 'moment'
+import {deep} from '@/assets/js/utils.js'
 
 // 全局注册eventBus
-// window.enentBus = new Vue()
+window.eventBus = new Vue()
 Vue.use(vueEventCalendar, {locale: 'en'}) //可以设置语言，支持中文和英文
 
 Vue.prototype.$moment = moment
